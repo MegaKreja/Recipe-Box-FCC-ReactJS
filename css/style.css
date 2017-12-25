@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Itim", cursive;
+}
+
+#container {
+  background: #7474bf;
+  background: -webkit-linear-gradient(to right, #7474bf, #348ac7);
+  background: linear-gradient(to right, #7474bf, #348ac7);
+  height: 100%;
+  min-height: 100vh;
+}
+
+#header {
+  font-size: 1.8rem;
+  text-align: center;
+  color: white;
+}
+
+#recipeList {
+  color: white;
+  margin: 0 auto;
+  text-transform: uppercase;
+  padding-top: 8%;
+  width: 30%;
+  text-align: center;
+}
+
+#recipeList h1 {
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+#recipeList #btnAdd, #submit {
+  margin-top: 8%;
+  cursor: pointer;
+  border: 3px solid white;
+  color: white;
+}
+
+#recipeList #list {
+  border: 3px solid white;
+  border-radius: 25px;
+  margin-bottom: 3%;
+}
+
+#recipeList #list #editDelete i {
+  font-size: 1.8rem;
+  width: 100px;
+  cursor: pointer;
+}
+
+#inputMenu {
+  text-align: center;
+  font-size: 2rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+#inputMenu label {
+  color: white;
+}
+
+#inputMenu #meal {
+  font-size: 2rem;
+}
+
+#inputMenu #ingredients {
+  margin-top: 5%;
+  font-size: 1rem;
+}

@@ -1,0 +1,208 @@
+class MainApp extends React.Component {
+  constructor(props) {
+    super(props);
+    this.openMenu = this.openMenu.bind(this);
+    this.addInput = this.addInput.bind(this);
+    this.addRecipe = this.addRecipe.bind(this);
+    this.changeMealInput = this.changeMealInput.bind(this);
+    this.changeIngredientsInput = this.changeIngredientsInput.bind(this);
+    this.editRecipe = this.editRecipe.bind(this);
+    this.editRecipeInput = this.editRecipeInput.bind(this);
+    this.deleteRecipe = this.deleteRecipe.bind(this);
+    this.state = {
+      recipes: [ 
+        {
+          meal: "pizza",
+          ingredients: "ketchup, mayo, ham, mushroom" 
+        },
+        {
+          meal: "beans",
+          ingredients: "bean, meat, water"
+        },
+        {
+          meal: "spaghetti",
+          ingredients: "water, meat"
+        },
+      ],
+      isOpen: false,           // state for opening menu
+      isAdd: false,            // state if is recipe opened or input new recipe
+      isEdit: false,           // state if edit recipe opened
+      index: "",               // index for adding recipes
+      indexEdit: "",           // index for editing recipes
+      inputMeal: "",            // <--------values from input meal
+      inputIngredients: ""       // <--------values from input ingredients
+    }
+  }
+  
+  componentWillMount() {
+    if(localStorage.getItem('_MegaKreja_recipes') !== null){
+      this.setState({
+        recipes: JSON.parse(localStorage.getItem('_MegaKreja_recipes'))
+      });
+    }
+  }
+  
+  componentDidUpdate(prevProps, prevState) {
+    localStorage.setItem('_MegaKreja_recipes', JSON.stringify(this.state.recipes));
+    console.log(prevState);
+  }
+//   method for opening recipe
+  openMenu(index) {
+    this.setState((prevState) => {
+      return {
+        isOpen: !prevState.isOpen,
+        index: index
+      };
+    });
+  }
+//   method for opening input menu
+  addInput() {
+    this.setState((prevState) => {
+      return {
+        isAdd: true
+      };
+    });
+  }
+//   open edit recipe menu
+  editRecipe(index) {
+    this.setState((prevState) => {
+      return {
+        isEdit: true,
+        indexEdit: index,
+        inputMeal: prevState.recipes[index].meal,
+        inputIngredients: prevState.recipes[index].ingredients
+      }
+    });
+  }
+//   edit recipe input and closing input
+  editRecipeInput(inputMeal, inputIngredients, index) {
+    let recipes = this.state.recipes;
+    recipes[index].meal = inputMeal;
+    recipes[index].ingredients = inputIngredients;
+    this.setState((prevState) => {
+      return {
+        recipes: recipes,
+        isEdit: false,
+        inputMeal: "",
+        inputIngredients: ""
+      };
+    })
+  }
+//   delete recipe
+  deleteRecipe(index) {
+    let recipes = this.state.recipes;
+    recipes.splice(index, 1);
+    this.setState((prevState) => {
+      recipes: recipes
+    });
+  }
+//   method for pushing recipes in recipe array and hiding input menu
+  addRecipe(inputMeal, inputIngredients) {
+    let recipes = this.state.recipes;
+    let newRecipe = {
+      meal: inputMeal,
+      ingredients: inputIngredients
+    }
+    recipes.push(newRecipe);
+    this.setState(() => {
+      return {
+        recipes: recipes,
+        isAdd: false,
+        inputMeal: "",
+        inputIngredients: ""
+      };
+    });
+  }
+//   change meal input, get value from meal input
+  changeMealInput(input) {
+    this.setState((prevState) => {
+      return {
+        inputMeal: input
+      };
+    });
+  }
+  //   change ingredient input, get value from ingredients input
+  changeIngredientsInput(input) {
+    this.setState((prevState) => {
+      return {
+        inputIngredients: input
+      };
+    });
+  }
+  
+  render() {
+    return (
+      <div id="container">
+        <Header />
+        {(!this.state.isAdd && !this.state.isEdit) && <RecipeList list={this.state.recipes} isOpen={this.state.isOpen} openMenu={this.openMenu} addInput={this.addInput} index={this.state.index} isEdit={this.state.isEdit} editRecipe={this.editRecipe} deleteRecipe={this.deleteRecipe}/>}
+        {this.state.isAdd && <InputRecipe addInput={this.addInput} addRecipe={this.addRecipe} inputMeal={this.state.inputMeal} inputIngredients={this.state.inputIngredients} changeMealInput={this.changeMealInput} changeIngredientsInput={this.changeIngredientsInput} />}
+        {this.state.isEdit && <EditRecipe editRecipe={this.editRecipe} indexEdit={this.state.indexEdit} recipes={this.state.recipes} changeMealInput={this.changeMealInput} changeIngredientsInput={this.changeIngredientsInput} inputMeal={this.state.inputMeal} inputIngredients={this.state.inputIngredients} editRecipeInput={this.editRecipeInput}/>}
+      </div>
+    );
+  }
+}
+// zato sto je isOpen true otvara sve recepte sutra videti sta sa tim 
+const Header = (props) => {
+  return (
+    <div id="header">
+      <h1>Recipe Box</h1>
+    </div>
+  );
+}
+
+class RecipeList extends React.Component {
+  changeRadius(index) {
+    return {
+      borderRadius: (this.props.isOpen && this.props.index === index) && 0
+    };
+  };
+  render() {
+    const list = this.props.list.map((recipe, i) => {
+      return (
+        <div id="list" style={this.changeRadius(i)}>
+          <h1 onClick={() => this.props.openMenu(i)}>{recipe.meal}</h1>
+          {(this.props.isOpen && this.props.index === i) && <p>Ingredients: {recipe.ingredients}</p>}
+          {(this.props.isOpen && this.props.index === i) && 
+            <div id="editDelete">
+              <i className="fa fa-pencil-square-o" area-hidden="true" onClick={() => this.props.editRecipe(i)}></i>
+              <i className="fa fa-trash-o" area-hidden="true" onClick={() => this.props.deleteRecipe(i)}></i>
+            </div>}
+        </div>
+      );
+    });
+    return (
+      <div id="recipeList">
+        {list}
+        <p id="btnAdd" onClick={this.props.addInput}>Add new recipe</p>
+      </div>
+    );
+  }
+}
+
+const InputRecipe = (props) => {
+  return (
+    <div id="inputMenu">
+      <label>Meal: </label>
+      <input type="text" id="meal" value={props.inputMeal} onChange={ (e) => props.changeMealInput(e.target.value)}/>
+      <br />
+      <label>Ingredients: </label>
+      <textarea rows="5" cols="50" type="text" id="ingredients" value={props.inputIngredients} onChange={ (e) => props.changeIngredientsInput(e.target.value)} />
+      {(props.inputMeal.length > 0 && props.inputIngredients.length > 0) && <p id="submit" onClick={() => props.addRecipe(props.inputMeal, props.inputIngredients)}>Submit</p>}
+    </div>
+  );
+}
+// prepraviti sutradan ovo, razmisliti dobro kako indeks dugmeta implementirati, napraviti zasebne metode i pocetni value izjednaciti sa recipes state
+const EditRecipe = (props) => {
+  return (
+    <div id="inputMenu">
+      <label>Meal: </label>
+      <input type="text" id="meal" value={props.inputMeal} onChange={ (e) => props.changeMealInput(e.target.value)}/>
+      <br />
+      <label>Ingredients: </label>
+      <textarea rows="5" cols="50" type="text" id="ingredients" value={props.inputIngredients} onChange={ (e) => props.changeIngredientsInput(e.target.value)} />
+      {(props.inputMeal.length > 0 && props.inputIngredients.length > 0) && <p id="submit" onClick={() => props.editRecipeInput(props.inputMeal, props.inputIngredients, props.indexEdit)}>Submit</p>}
+    </div>
+  );
+}
+
+ReactDOM.render(<MainApp />, document.getElementById("app"));
